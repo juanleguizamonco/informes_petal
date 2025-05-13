@@ -1,0 +1,9 @@
+import os
+
+CATALOG_STORAGE = os.getenv("CATALOG_STORAGE", "./data/catalog.xlsx")
+TEMPLATE_STORAGE = os.getenv("TEMPLATE_STORAGE", "./data/formats.xlsx")
+OUTPUT_STORAGE_GL = ""
+OUTPUT_STORAGE_PAY = ""
+
+AZURE_STORAGE_CONNECTION_STRING =""
+AZURE_CONTAINER_NAME = ""
