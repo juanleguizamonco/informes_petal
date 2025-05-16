@@ -1,0 +1,45 @@
+# Entorno virtual
+venv/
+.venv/
+
+# Archivos de Python compilados
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Archivos de entorno y configuración local
+.env
+.env.*
+
+# Archivos de logs
+*.log
+
+# Archivos de bases de datos SQLite (opcional)
+*.sqlite3
+*.db
+
+# Archivos de pytest
+.cache/
+.pytest_cache/
+
+# Configuración de editores y sistemas operativos
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Archivos de cobertura de tests
+htmlcov/
+.coverage
+coverage.xml
+*.cover
+*.py,cover
+
+# Archivos de distribución
+build/
+dist/
+*.egg-info/
+
+# Carpeta de dependencias si usas poetry o pipenv
+poetry.lock
+Pipfile.lock
