@@ -1,8 +1,10 @@
 import pandas as pd
 from typing import Dict, List, Optional, Union, Any
 
-def amount_calculation(
+
+def amount_calculation_prorrateo(
     value: float,
+    percentage_cc: float,
     catalog: pd.DataFrame,
     paycode: Union[str, int],
     employee_id: str,
@@ -21,10 +23,11 @@ def amount_calculation(
     cred_account_recipient: str
 ) -> pd.DataFrame:
     """
-    Calculates amounts for financial transactions based on payment codes.
+    Calculates prorated amounts for financial transactions based on payment codes.
     
     Args:
         value: Base value for calculation
+        percentage_cc: Percentage to apply for cost center proration
         catalog: Main catalog DataFrame
         paycode: Payment code to look up
         employee_id: Employee ID
@@ -43,7 +46,7 @@ def amount_calculation(
         cred_account_recipient: Column name for recipient's credit account
     
     Returns:
-        DataFrame with calculated amounts and corresponding accounting information
+        DataFrame with calculated prorated amounts and corresponding accounting information
     """
     # Convert paycode to string and remove whitespace
     paycode_str = str(paycode).strip()
@@ -58,8 +61,8 @@ def amount_calculation(
     if catalog_matches.empty:
         return pd.DataFrame()
     
-    # Convert base value to float
-    base_amount = float(value)
+    # Calculate prorated base amount
+    base_amount = float(value) * percentage_cc
     
     # List to store results
     amounts = []
@@ -82,11 +85,8 @@ def amount_calculation(
             # Determine amount sign based on accounting type
             if accounting_type in ['D-', 'C+']:
                 amount = -base_amount
-            else:
+            elif accounting_type in ['P+', 'N+'] and df_employee is not None and not df_employee.empty:
                 amount = base_amount
-            
-            # Special case for P+ and N+ types
-            if accounting_type in ['P+', 'N+'] and df_employee is not None and not df_employee.empty:
                 # Process special entries from catalog2
                 for _, emp_row in df_employee.iterrows():
                     client_id = f"{emp_row[employee_id_code]} {emp_row[type_cat]}"
@@ -99,16 +99,20 @@ def amount_calculation(
                         'GLFile': gl_file,
                         'Item Text': item_text
                     })
+                # Skip standard entry for P+/N+ types
+                continue
             else:
-                # Add standard entry
-                amounts.append({
-                    'Amount': amount,
-                    'DEBIT account': debit_account,
-                    'CREDIT account': credit_account,
-                    'Client Code': client_code,
-                    'Campo': campo,
-                    'GLFile': gl_file,
-                    'Item Text': item_text
-                })
+                amount = base_amount
+                
+            # Add standard entry
+            amounts.append({
+                'Amount': amount,
+                'DEBIT account': debit_account,
+                'CREDIT account': credit_account,
+                'Client Code': client_code,
+                'Campo': campo,
+                'GLFile': gl_file,
+                'Item Text': item_text
+            })
     
     return pd.DataFrame(amounts)
